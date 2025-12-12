@@ -21,21 +21,20 @@ jobs:
         distribution: 'temurin'
         cache: gradle
     
-    # 1. توفير ملف google-services.json وتصحيح تضارب المسارات
+    # 1. توفير ملف google-services.json (تم تصحيح الإزاحة)
     - name: Provide google-services.json
       if: env.GOOGLE_SERVICES_JSON != ''
       run: |
-        # إنشاء الملف في المسار: app/google-services.json
+        # المسار الصحيح للإنشاء (بناءً على ما يتوقعه ملف gradle)
+        # تم الافتراض: المشروع يتوقع الملف داخل مجلد app/
         echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
-        # عرض معلومات الملف في نفس المسار (للتأكد)
+        # التحقق من وجود الملف
         ls -l app/google-services.json 
 
-    # 2. منح إذن التنفيذ لملف gradlew (باستخدام المسار app/gradlew)
+    # 2. منح إذن التنفيذ لـ gradlew (باستخدام المسار الصحيح: الجذر)
     - name: Grant execute permission for gradlew
-      run: chmod +x app/gradlew
-
-    # 3. بناء المشروع (تحديد دليل العمل لتبسيط الأمر)
-    # سيتم تنفيذ الأمر (./gradlew build) من داخل المجلد (app/)
+      run: chmod +x gradlew # المسار الصحيح هو "gradlew" لأنه في جذر المستودع
+    
+    # 3. بناء المشروع
     - name: Build with Gradle
       run: ./gradlew build
-      working-directory: app # ⬅️ تحديد دليل العمل (Working Directory) لكي يعمل ./gradlew بشكل صحيح
