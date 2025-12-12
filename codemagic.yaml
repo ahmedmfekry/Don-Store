@@ -1,0 +1,53 @@
+#
+# codemagic.yaml
+#
+
+workflows:
+  android-release:
+    name: Android Release Build
+    
+    # 1. البيئة (Environment Setup)
+    # تحدد البيئة التي سيتم عليها البناء (جهاز Linux مع Java 11)
+    environment:
+      # اختيار صورة Docker تحتوي على الأدوات المطلوبة (Android SDK)
+      docker: codemagic/android:latest 
+      # تحديد إصدار Java المطلوب (Java 11)
+      java: 11 
+      # مجموعة المتغيرات السرية (يجب تعريفها في إعدادات Codemagic)
+      # يُستخدم لتحديد مكان تخزين المفاتيح السرية مثل مفاتيح التوقيع أو ملفات Firebase
+      groups:
+        - firebase_credentials # افترضنا أن GOOGLE_SERVICES_JSON هو جزء من هذه المجموعة
+        - keystore_credentials # يمكن إضافتها لاحقاً لتوقيع التطبيق
+    
+    # 2. خطوات ما قبل البناء (Pre-build steps)
+    scripts:
+      
+      # 2.1. منح إذن التنفيذ لـ gradlew
+      - name: Grant execute permission for gradlew
+        script: |
+          chmod +x gradlew
+          
+      # 2.2. توفير ملف google-services.json
+      # فك تشفير محتوى المتغير السري (GOOGLE_SERVICES_JSON) وتخزينه كملف
+      - name: Decode google-services.json
+        # يتم تشغيل هذا الأمر فقط إذا كان المتغير GOOGLE_SERVICES_JSON موجوداً
+        if: environment.vars.GOOGLE_SERVICES_JSON
+        script: |
+          # المتغير GOOGLE_SERVICES_JSON يجب أن يكون قيمة مشفرة (Base64) لملف google-services.json
+          echo $GOOGLE_SERVICES_JSON | base64 --decode > app/google-services.json
+          echo "google-services.json created in app/ directory."
+
+      # 2.3. تشغيل عملية البناء
+      - name: Build Android Release APK
+        script: |
+          # لتوليد APK: استخدم assembleRelease
+          ./gradlew assembleRelease
+          
+          # ملاحظة: لتوليد حزمة AAB (موصى بها لمتجر Play):
+          # ./gradlew bundleRelease
+          
+    # 3. القطع الأثرية (Artifacts)
+    # تحديد مكان وجود ملفات الإخراج الناتجة عن البناء ليتم حفظها
+    artifacts:
+      - app/build/outputs/apk/release/*.apk # لحفظ ملفات APK الناتجة (إذا استخدمت assembleRelease)
+      - app/build/outputs/bundle/release/*.aab # لحفظ ملفات AAB الناتجة (إذا استخدمت bundleRelease)
