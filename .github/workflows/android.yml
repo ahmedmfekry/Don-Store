@@ -19,15 +19,27 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: gradle
-- name: Provide google-services.json
-        if: env.GOOGLE_SERVICES_JSON != ''
-        run: |
-          echo "$GOOGLE_SERVICES_JSON" | base64 --decode > android/app/google-services.json
-          ls -l app/google-services.json
+    
+    # ⚠️ ملاحظة: تأكد من أن هذه الخطوة على نفس مستوى إزاحة "steps" السابقة
+    - name: Provide google-services.json
+      if: env.GOOGLE_SERVICES_JSON != ''
+      run: |
+        # المسار الصحيح هنا هو android/app/ إذا كان ملف google-services.json يوجد بداخله
+        echo "$GOOGLE_SERVICES_JSON" | base64 --decode > android/app/google-services.json
+        # المسار في الأمر ls -l يجب أن يكون متوافقاً مع المسار أعلاه
+        ls -l android/app/google-services.json 
 
-           name: Make gradlew executable
-        run: chmod +x app/gradlew
+    # ⬅️ المسار الصحيح لملف gradlew هو في جذر المستودع
     - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      run: chmod +x gradlew # استخدام "gradlew" أو "./gradlew"
+      
+    # ❌ قم بإزالة هذه الخطوة المكررة أو الخاطئة في المسار
+    # - name: Make gradlew executable
+    #   run: chmod +x app/gradlew 
+
+    # ❌ وقم بإزالة هذه الخطوة أيضاً لأنها أصبحت مكررة للخطوة أعلاه
+    # - name: Grant execute permission for gradlew
+    #   run: chmod +x gradlew
+      
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./app/gradlew build
