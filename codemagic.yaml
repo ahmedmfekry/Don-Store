@@ -1,5 +1,5 @@
 #
-# codemagic.yaml
+# codemagic.yaml - مصحح ليناسب بنية Codemagic
 #
 
 workflows:
@@ -7,47 +7,53 @@ workflows:
     name: Android Release Build
     
     # 1. البيئة (Environment Setup)
-    # تحدد البيئة التي سيتم عليها البناء (جهاز Linux مع Java 11)
     environment:
-      # اختيار صورة Docker تحتوي على الأدوات المطلوبة (Android SDK)
-      docker: codemagic/android:latest 
-      # تحديد إصدار Java المطلوب (Java 11)
-      java: 11 
+      # يتم وضع إعدادات Java و Docker في هذا المستوى 
+      # ملاحظة: يتم تحديد صورة Docker في إعدادات التطبيق أو عبر خاصية 'instance_type' إذا لزم الأمر
+      # يتم تحديد إصدار Java المطلوب
+      java: 
+        - 11
+        
       # مجموعة المتغيرات السرية (يجب تعريفها في إعدادات Codemagic)
-      # يُستخدم لتحديد مكان تخزين المفاتيح السرية مثل مفاتيح التوقيع أو ملفات Firebase
       groups:
-        - firebase_credentials # افترضنا أن GOOGLE_SERVICES_JSON هو جزء من هذه المجموعة
-        - keystore_credentials # يمكن إضافتها لاحقاً لتوقيع التطبيق
+        - firebase_credentials # يحتوي على GOOGLE_SERVICES_JSON
+        # - keystore_credentials # يمكن إضافتها لاحقاً لتوقيع التطبيق
     
-    # 2. خطوات ما قبل البناء (Pre-build steps)
+    # 2. خطوة التفعيل (Checkout) - يتم تفعيلها تلقائياً
+    
+    # 3. خطوات البناء (Scripts)
     scripts:
       
-      # 2.1. منح إذن التنفيذ لـ gradlew
+      # 3.1. منح إذن التنفيذ لـ gradlew
       - name: Grant execute permission for gradlew
         script: |
+          # بما أن ملف gradlew في جذر المستودع
           chmod +x gradlew
           
-      # 2.2. توفير ملف google-services.json
-      # فك تشفير محتوى المتغير السري (GOOGLE_SERVICES_JSON) وتخزينه كملف
+      # 3.2. توفير ملف google-services.json
       - name: Decode google-services.json
-        # يتم تشغيل هذا الأمر فقط إذا كان المتغير GOOGLE_SERVICES_JSON موجوداً
-        if: environment.vars.GOOGLE_SERVICES_JSON
+        # **الحل لـ Error 2 & 3:**
+        # تم دمج المنطق الشرطي (if) مع الأمر script نفسه لأن Codemagic لا يدعم 'if' مباشرة تحت 'script'
         script: |
-          # المتغير GOOGLE_SERVICES_JSON يجب أن يكون قيمة مشفرة (Base64) لملف google-services.json
-          echo $GOOGLE_SERVICES_JSON | base64 --decode > app/google-services.json
-          echo "google-services.json created in app/ directory."
-
-      # 2.3. تشغيل عملية البناء
+          # التحقق مما إذا كان المتغير GOOGLE_SERVICES_JSON موجوداً، ثم تنفيذ فك التشفير
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            echo "Decoding google-services.json..."
+            echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
+            echo "google-services.json created in app/ directory."
+          else
+            echo "GOOGLE_SERVICES_JSON environment variable not found. Skipping file creation."
+          fi
+          
+      # 3.3. تشغيل عملية البناء
       - name: Build Android Release APK
         script: |
-          # لتوليد APK: استخدم assembleRelease
+          # لتوليد APK (هذا هو الأمر الأساسي للبناء)
           ./gradlew assembleRelease
           
-          # ملاحظة: لتوليد حزمة AAB (موصى بها لمتجر Play):
+          # لتوليد حزمة AAB (موصى بها لمتجر Play):
           # ./gradlew bundleRelease
           
-    # 3. القطع الأثرية (Artifacts)
-    # تحديد مكان وجود ملفات الإخراج الناتجة عن البناء ليتم حفظها
+    # 4. القطع الأثرية (Artifacts)
     artifacts:
-      - app/build/outputs/apk/release/*.apk # لحفظ ملفات APK الناتجة (إذا استخدمت assembleRelease)
-      - app/build/outputs/bundle/release/*.aab # لحفظ ملفات AAB الناتجة (إذا استخدمت bundleRelease)
+      - app/build/outputs/apk/release/*.apk 
+      - app/build/outputs/bundle/release/*.aab
