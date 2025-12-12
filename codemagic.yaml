@@ -1,52 +1,48 @@
 #
-# codemagic.yaml - مصحح بالكامل
+# codemagic.yaml - مصحح مع استخدام working_directory
 #
 
 workflows:
   android-release:
     name: Android Release Build
     
-    # 1. البيئة (Environment Setup)
     environment:
-      # تصحيح الخطأ: يجب أن تكون قيمة Java نصاً (String) وليس قائمة (List)
-      java: 11 # ⬅️ تم تغييرها إلى قيمة نصية
-
-      # مجموعة المتغيرات السرية (يتم سحبها من إعدادات Codemagic)
+      java: 11 # ⬅️ تم تصحيح البنية
       groups:
-        - firebase_credentials # يحتوي على GOOGLE_SERVICES_JSON
-        # يمكنك إضافة:
-        # - keystore_credentials # لتوقيع التطبيق
+        - firebase_credentials 
+        # - keystore_credentials 
     
-    # 2. خطوات البناء (Scripts)
     scripts:
       
-      # 2.1. منح إذن التنفيذ لـ gradlew (بما أن gradlew في جذر المستودع)
-      - name: Grant execute permission for gradlew
-        script: |
-          chmod +x gradlew
-          
-      # 2.2. توفير ملف google-services.json
+      # 1. فك تشفير google-services.json
+      # هذه الخطوة تبقى كما هي، لكن يجب التأكد من المسار النهائي
       - name: Decode google-services.json
         script: |
-          # استخدام bash للتحقق من وجود المتغير السري قبل فك التشفير
           if [ -n "$GOOGLE_SERVICES_JSON" ]; then
             echo "Decoding google-services.json..."
-            # يتم وضع الملف في المسار app/
+            # المسار: app/google-services.json (بافتراض أن app/ هو مجلد في الجذر)
             echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
             echo "google-services.json created in app/ directory."
           else
             echo "GOOGLE_SERVICES_JSON environment variable not found. Skipping file creation."
           fi
           
-      # 2.3. تشغيل عملية البناء
+      # 2. منح إذن التنفيذ لـ gradlew
+      - name: Grant execute permission for gradlew
+        script: |
+          # ⬅️ استخدام ./gradlew لكي يتم العثور على الملف في أي working_directory
+          chmod +x ./gradlew 
+        working_directory: android # ⬅️ يتم تنفيذ الأمر داخل مجلد "android"
+
+      # 3. تشغيل عملية البناء
       - name: Build Android Release AAB
         script: |
-          # استخدام bundleRelease لإنشاء AAB (الأفضل للنشر على متجر Play)
+          # ⬅️ استخدام ./gradlew لكي يتم العثور على الملف
           ./gradlew bundleRelease 
+        working_directory: android # ⬅️ يتم تنفيذ الأمر داخل مجلد "android"
           
-    # 3. القطع الأثرية (Artifacts)
+    # 4. القطع الأثرية (Artifacts)
     artifacts:
-      # لحفظ ملفات AAB الناتجة
-      - app/build/outputs/bundle/release/*.aab
-      # لحفظ ملفات APK الناتجة (إذا كنت تبنيها)
-      - app/build/outputs/apk/release/*.apk
+      # يجب أن تعكس مسارات القطع الأثرية وجود مجلد android/app/
+      - android/app/build/outputs/bundle/release/*.aab
+      - android/app/build/outputs/apk/release/*.apk
