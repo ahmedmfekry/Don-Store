@@ -28,16 +28,10 @@ jobs:
         echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
         # المسار في الأمر ls -l يجب أن يكون متوافقاً مع المسار أعلاه
         ls -l android/app/google-services.json 
+     - name: Grant execute permission for gradlew
+  run: chmod +x app/gradlew # استخدام المسار الصحيح للملف
 
-- uses: actions/checkout@v4
-# ... خطوات setup-java ...
-
-# منح الإذن داخل المجلد
-- name: Grant execute permission for gradlew
-  run: chmod +x gradlew
-  working-directory: app # ⬅️ سيتم تنفيذ الأمر داخل مجلد "android/"
-
-# البناء باستخدام المسار داخل المجلد
-- name: Build with Gradle
+       - name: Build with Gradle
+  run: android/gradlew build # وتعديل أمر البناء ليتطابق مع المسار الجديد
   run: ./gradlew build
   working-directory: app # ⬅️ سيتم تنفيذ الأمر داخل مجلد "android/"
