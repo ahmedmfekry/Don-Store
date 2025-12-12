@@ -29,17 +29,15 @@ jobs:
         # المسار في الأمر ls -l يجب أن يكون متوافقاً مع المسار أعلاه
         ls -l android/app/google-services.json 
 
-    # ⬅️ المسار الصحيح لملف gradlew هو في جذر المستودع
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew # استخدام "gradlew" أو "./gradlew"
-      
-    # ❌ قم بإزالة هذه الخطوة المكررة أو الخاطئة في المسار
-    # - name: Make gradlew executable
-    #   run: chmod +x app/gradlew 
+- uses: actions/checkout@v4
+# ... خطوات setup-java ...
 
-    # ❌ وقم بإزالة هذه الخطوة أيضاً لأنها أصبحت مكررة للخطوة أعلاه
-    # - name: Grant execute permission for gradlew
-    #   run: chmod +x gradlew
-      
-    - name: Build with Gradle
-      run: ./app/gradlew build
+# منح الإذن داخل المجلد
+- name: Grant execute permission for gradlew
+  run: chmod +x gradlew
+  working-directory: app # ⬅️ سيتم تنفيذ الأمر داخل مجلد "android/"
+
+# البناء باستخدام المسار داخل المجلد
+- name: Build with Gradle
+  run: ./gradlew build
+  working-directory: app # ⬅️ سيتم تنفيذ الأمر داخل مجلد "android/"
