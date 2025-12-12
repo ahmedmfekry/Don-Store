@@ -12,7 +12,12 @@
           "package_name": "com.bloodinventory.bloodinventory"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "853530048966-elc864rjpms35ceqch5epdcmtijihqk0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAOFvt4BFx4ezkT1grze4bM6RJ5i9YqQk4"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "853530048966-elc864rjpms35ceqch5epdcmtijihqk0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
