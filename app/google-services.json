@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "853530048966",
+    "project_id": "blood-inventory-d825f",
+    "storage_bucket": "blood-inventory-d825f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:853530048966:android:3e9b626559b06a4a53dac7",
+        "android_client_info": {
+          "package_name": "com.bloodinventory.bloodinventory"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOFvt4BFx4ezkT1grze4bM6RJ5i9YqQk4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

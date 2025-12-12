@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">إدارة مخزون الدم</string>
+    <string name="add_item">إضافة صنف</string>
+    <string name="add_stock">إضافة مخزون</string>
+    <string name="dispense_stock">صرف مخزون</string>
+    <string name="return_stock">المرتجع</string>
+    <string name="item_name">اسم الصنف</string>
+    <string name="quantity">العدد</string>
+    <string name="unit">الوحدة</string>
+    <string name="lot_number">LOT Number</string>
+    <string name="expire_date">تاريخ الانتهاء</string>
+    <string name="date">التاريخ</string>
+    <string name="notes">ملاحظات</string>
+    <string name="save">حفظ</string>
+    <string name="cancel">إلغاء</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="logout">تسجيل الخروج</string>
+    <string name="welcome">مرحباً</string>
+    <string name="expiration_alert">تنبيه انتهاء الصلاحية</string>
+    <string name="item_expiring_soon">صنف يقترب من انتهاء الصلاحية</string>
+    <string name="select_item">اختر الصنف</string>
+    <string name="enter_item_name">أدخل اسم الصنف</string>
+    <string name="enter_quantity">أدخل العدد</string>
+    <string name="enter_unit">أدخل الوحدة</string>
+    <string name="enter_lot_number">أدخل LOT Number</string>
+    <string name="select_date">اختر التاريخ</string>
+    <string name="required_field">هذا الحقل مطلوب</string>
+    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID</string>
+</resources>
